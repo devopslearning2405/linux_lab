@@ -1,0 +1,3 @@
+# Open Terminal from MacOS
+
+osascript -e 'tell app "Terminal" to do script "ping 8.8.8.8"'
