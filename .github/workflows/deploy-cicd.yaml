@@ -25,7 +25,7 @@ jobs:
     needs: [Build]
     runs-on: ubuntu-latest
     environment:
-      name: Development Environment
+      name: Dev-Environment
     steps: 
       - name: Dev deploy 
         run: echo I am deploying to dev now !!!
@@ -36,7 +36,7 @@ jobs:
     needs: [Build]
     runs-on: ubuntu-latest
     environment: 
-      name: QA Environment
+      name: QA-Environment
     steps: 
       - name: DeployQA 
         run: echo iam deploy to QA !!!
@@ -45,45 +45,8 @@ jobs:
     needs: [DeployQA]
     runs-on: ubuntu-latest 
     environment:  
-      name: Production Environment
+      name: Prod-Environment
     steps: 
       - name: DeployProd 
         run: echo I am deploy to prod, thanks for your approval !!!
-      # - name: Configure credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: us-east-2
 
-      # - name: Login to ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
-      # - name: Build, tag, and push image to ECR
-      #   id: build-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: tmm-fe
-      #     IMAGE_TAG: dev-${{ github.sha }}
-      #   run: |
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-      # - name: Fill in the new image ID in the ECS task definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: .github/workflows/task-definition-dev.json
-      #     container-name: tmm-fe-dev
-      #     image: ${{ steps.build-image.outputs.image }}
-
-      # - name: Deploy ECS task definition
-      #   timeout-minutes: 5
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: tmm-fe-dev
-      #     cluster: TMM-ECS-Cluster-Dev
-      #     wait-for-service-stability: false
