@@ -8,9 +8,11 @@ trigger:
 
 
 
-pool:
-  vmImage: 'ubuntu-latest'
-
+# pool:
+#   vmImage: 'ubuntu-latest'
+job: Build
+  displayName: Build Maven Project
+  runs-on: ubuntu-latest
 steps:
 - task: NodeTool@0
   inputs:
@@ -45,3 +47,18 @@ steps:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)/npm'
     artifactName: npm
   displayName: 'Publish npm artifact'
+
+jobs: deployment
+# - deployment: VMDeploy
+  runs-on: ubuntu-latest
+  # displayName: web
+  # pool:
+  #   vmImage: 'ubuntu-latest'
+  environment:
+    name: dev
+    resourceType: VirtualMachine
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - script: echo my first deployment
