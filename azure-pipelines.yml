@@ -10,7 +10,7 @@ trigger:
 
 # pool:
 #   vmImage: 'ubuntu-latest'
-job: Build
+job:
   displayName: Build Maven Project
   runs-on: ubuntu-latest
 steps:
@@ -48,10 +48,10 @@ steps:
     artifactName: npm
   displayName: 'Publish npm artifact'
 
-jobs: deployment
+jobs:
 # - deployment: VMDeploy
   runs-on: ubuntu-latest
-  # displayName: web
+  displayName: Build Maven Project
   # pool:
   #   vmImage: 'ubuntu-latest'
   environment:
