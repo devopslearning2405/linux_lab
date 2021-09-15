@@ -12,39 +12,34 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  displayName: 'Install Node.js'
+# - task: NodeTool@0
+#   inputs:
+#     versionSpec: '12.x'
+#   displayName: 'Install Node.js'
 
-- script: |
-    ls
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+# - script: |
+#     ls
+#     npm install
+#   displayName: 'npm install and build'
 
-- script: |
-    npm pack
-  displayName: 'Package for npm release'
-
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '*.tgz' 
-    targetFolder: $(Build.ArtifactStagingDirectory)/npm
-  displayName: 'Copy npm package'
+# - task: CopyFiles@2
+#   inputs:
+#     sourceFolder: '$(Build.SourcesDirectory)'
+#     contents: '*.tgz' 
+#     targetFolder: $(Build.ArtifactStagingDirectory)/npm
+#   displayName: 'Copy npm package'
 
 - task: CopyFiles@2
   inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: 'package.json' 
-    targetFolder: $(Build.ArtifactStagingDirectory)/npm
-  displayName: 'Copy package.json'
+    sourceFolder: '.'
+    # contents: 'package.json' 
+    targetFolder: '$(Build.ArtifactStagingDirectory)'
+  displayName: 'Copy code'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/npm'
-    artifactName: npm
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: be-api
   displayName: 'Publish npm artifact'
 
 
