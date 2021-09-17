@@ -54,74 +54,78 @@ trigger:
 # pr: none
 
 stages:
-  # - stage: build
-  #   displayName: "Build"
-  #   jobs:
-  #     - job: build_test
-  #       displayName: "Archive API"
-  #       pool:
-  #         vmImage: ubuntu-latest
-  #       steps:
-
-  #         - task: PublishPipelineArtifact@1
-  #           displayName: "Publish API Artifact"
-  #           inputs:
-  #             targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
-  #             artifact: "api-drop"
-  #             publishLocation: "pipeline"
-
-
-  - stage: deploy
-    displayName: "Deploy"
+  - stage: build
+    displayName: "Build"
     jobs:
-      - deployment: VMDeploy
-        displayName: Deploy API
-        environment:
-          name: dev
-          resourceType: VirtualMachine
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: CmdLine@2
-                  displayName: "Create .env"
-                  inputs:
-                    script: |
-                      echo "abc"
-                    failOnStderr: true
-                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
-                # - task: CopyFiles@2
-                #   displayName: "Copy to deploy folder"
-                #   inputs:
-                #     SourceFolder: "$(Agent.BuildDirectory)/api-drop"
-                #     Contents: "**"
-                #     TargetFolder: "/srv/strapi"
-                #     CleanTargetFolder: true
-                #     OverWrite: true
+      - job: build_test
+        displayName: "Archive API"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
 
-                - task: CmdLine@2
-                  displayName: "Install, Build"
-                  inputs:
-                    script: |
-                      yarn
-                      yarn build
-                      whereis pm2
-                      pwd
-                      whoami
-                      #pm2 restart ecosystem.config.js
-                    # workingDirectory: /srv/strapi
-                # - task: Bash@3
-                #   displayName: "Restart PM2"
-                #   inputs:
-                #     targetType: 'inline'
-                #     script: |
-                #       pm2 reload ecosystem.config.js
-                #     workingDirectory: /srv/strapi
-                #     noProfile: false
-                #     noRc: false
-                - task: Bash@3
-                  displayName: "Restart PM2"
-                  inputs:
-                    filePath: '/srv/strapi/scripts/deploy.sh'
-                    noProfile: false
-                    noRc: false
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish API Artifact"
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
+              artifact: "api-drop"
+              publishLocation: "pipeline"
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#     artifactName: be-api
+#   displayName: 'Publish npm artifact'
+
+  # - stage: deploy
+  #   displayName: "Deploy"
+  #   jobs:
+  #     - deployment: VMDeploy
+  #       displayName: Deploy API
+  #       environment:
+  #         name: dev
+  #         resourceType: VirtualMachine
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+  #               - task: CmdLine@2
+  #                 displayName: "Create .env"
+  #                 inputs:
+  #                   script: |
+  #                     echo "abc"
+  #                   failOnStderr: true
+  #                   # workingDirectory: $(Agent.BuildDirectory)/api-drop
+  #               # - task: CopyFiles@2
+  #               #   displayName: "Copy to deploy folder"
+  #               #   inputs:
+  #               #     SourceFolder: "$(Agent.BuildDirectory)/api-drop"
+  #               #     Contents: "**"
+  #               #     TargetFolder: "/srv/strapi"
+  #               #     CleanTargetFolder: true
+  #               #     OverWrite: true
+
+  #               - task: CmdLine@2
+  #                 displayName: "Install, Build"
+  #                 inputs:
+  #                   script: |
+  #                     yarn
+  #                     yarn build
+  #                     whereis pm2
+  #                     pwd
+  #                     whoami
+  #                     #pm2 restart ecosystem.config.js
+  #                   # workingDirectory: /srv/strapi
+  #               # - task: Bash@3
+  #               #   displayName: "Restart PM2"
+  #               #   inputs:
+  #               #     targetType: 'inline'
+  #               #     script: |
+  #               #       pm2 reload ecosystem.config.js
+  #               #     workingDirectory: /srv/strapi
+  #               #     noProfile: false
+  #               #     noRc: false
+  #               - task: Bash@3
+  #                 displayName: "Restart PM2"
+  #                 inputs:
+  #                   filePath: '/srv/strapi/scripts/deploy.sh'
+  #                   noProfile: false
+  #                   noRc: false
