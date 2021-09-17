@@ -89,7 +89,7 @@ stages:
                     script: |
                       echo "abc"
                     failOnStderr: true
-                    workingDirectory: $(Agent.BuildDirectory)/api-drop
+                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
                 # - task: CopyFiles@2
                 #   displayName: "Copy to deploy folder"
                 #   inputs:
@@ -109,7 +109,7 @@ stages:
                       pwd
                       whoami
                       #pm2 restart ecosystem.config.js
-                    workingDirectory: /srv/strapi
+                    # workingDirectory: /srv/strapi
                 # - task: Bash@3
                 #   displayName: "Restart PM2"
                 #   inputs:
