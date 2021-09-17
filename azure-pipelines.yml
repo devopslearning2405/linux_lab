@@ -66,9 +66,11 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: "Publish API Artifact"
             inputs:
-              targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
-              artifact: "api-drop"
-              publishLocation: "pipeline"
+              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              # targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
+              artifactName: be-api
+              # artifact: "api-drop"
+              # publishLocation: "pipeline"
 # - task: PublishBuildArtifacts@1
 #   inputs:
 #     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
