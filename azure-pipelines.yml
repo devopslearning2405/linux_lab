@@ -113,7 +113,8 @@ stages:
                     script: |
                       yarn
                       yarn build
-                      whereis pm2
+                      which pm2
+                      pm2
                       pwd
                       ls
                     workingDirectory: /etc/server
