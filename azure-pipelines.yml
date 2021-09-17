@@ -114,8 +114,9 @@ stages:
                       yarn
                       yarn build
                       which pm2
-                      pm2
                       pwd
                       ls
+                      whoami
+                      pm2 restart app.js
                     workingDirectory: /etc/server
 
