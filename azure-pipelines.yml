@@ -67,7 +67,7 @@ stages:
             displayName: "Publish API Artifact"
             inputs:
               # pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
+              targetPath: "$(System.DefaultWorkingDirectory)"
               # artifactName: be-api
               artifact: "be-api"
               publishLocation: "pipeline"
@@ -95,6 +95,7 @@ stages:
                     script: |
                       echo "abc"
                       pwd
+                      ls
                     workingDirectory: $(Agent.BuildDirectory)
                     failOnStderr: true
 
