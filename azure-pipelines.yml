@@ -110,7 +110,7 @@ stages:
                   inputs:
                     SourceFolder: "$(Agent.BuildDirectory)"
                     Contents: "**"
-                    TargetFolder: "/ect/server"
+                    TargetFolder: "/etc/server"
                     CleanTargetFolder: true
                     OverWrite: true
 
