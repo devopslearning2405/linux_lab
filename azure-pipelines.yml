@@ -66,11 +66,11 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: "Publish API Artifact"
             inputs:
-              pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              # targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
-              artifactName: be-api
-              # artifact: "api-drop"
-              # publishLocation: "pipeline"
+              # pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
+              # artifactName: be-api
+              artifact: "be-api"
+              publishLocation: "pipeline"
 # - task: PublishBuildArtifacts@1
 #   inputs:
 #     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -97,14 +97,7 @@ stages:
                       pwd
                     workingDirectory: $(Agent.BuildDirectory)
                     failOnStderr: true
-                - task: CmdLine@2
-                  displayName: "Install, Build"
-                  inputs:
-                    script: |
-                      whoami
-                      pwd
-                      ls
-                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
+
                 - task: CopyFiles@2
                   displayName: "Copy to deploy folder"
                   inputs:
@@ -113,4 +106,12 @@ stages:
                     TargetFolder: "/etc/server"
                     CleanTargetFolder: true
                     OverWrite: true
+                - task: CmdLine@2
+                  displayName: "Install, Build"
+                  inputs:
+                    script: |
+                      whoami
+                      pwd
+                      ls
+                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
 
