@@ -94,6 +94,7 @@ stages:
                   inputs:
                     script: |
                       echo "abc"
+                      ls $(Build.ArtifactStagingDirectory)
                     failOnStderr: true
                     # workingDirectory: $(Agent.BuildDirectory)/api-drop
   #               # - task: CopyFiles@2
@@ -105,17 +106,17 @@ stages:
   #               #     CleanTargetFolder: true
   #               #     OverWrite: true
 
-  #               - task: CmdLine@2
-  #                 displayName: "Install, Build"
-  #                 inputs:
-  #                   script: |
-  #                     yarn
-  #                     yarn build
-  #                     whereis pm2
-  #                     pwd
-  #                     whoami
-  #                     #pm2 restart ecosystem.config.js
-  #                   # workingDirectory: /srv/strapi
+                - task: CmdLine@2
+                  displayName: "Install, Build"
+                  inputs:
+                    script: |
+                      yarn
+                      yarn build
+                      whereis pm2
+                      pwd
+                      whoami
+                      #pm2 restart ecosystem.config.js
+                    # workingDirectory: /srv/strapi
   #               # - task: Bash@3
   #               #   displayName: "Restart PM2"
   #               #   inputs:
