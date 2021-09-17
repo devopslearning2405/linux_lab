@@ -102,7 +102,7 @@ stages:
                 - task: CopyFiles@2
                   displayName: "Copy to deploy folder"
                   inputs:
-                    SourceFolder: "$(Agent.BuildDirectory)"
+                    SourceFolder: "$(Agent.BuildDirectory)/be-api"
                     Contents: "**"
                     TargetFolder: "/etc/server"
                     CleanTargetFolder: true
@@ -111,8 +111,10 @@ stages:
                   displayName: "Install, Build"
                   inputs:
                     script: |
-                      whoami
+                      yarn
+                      yarn build
+                      whereis pm2
                       pwd
                       ls
-                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
+                    workingDirectory: /etc/server
 
