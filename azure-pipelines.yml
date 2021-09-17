@@ -77,25 +77,25 @@ stages:
 #     artifactName: be-api
 #   displayName: 'Publish npm artifact'
 
-  # - stage: deploy
-  #   displayName: "Deploy"
-  #   jobs:
-  #     - deployment: VMDeploy
-  #       displayName: Deploy API
-  #       environment:
-  #         name: dev
-  #         resourceType: VirtualMachine
-  #       strategy:
-  #         runOnce:
-  #           deploy:
-  #             steps:
-  #               - task: CmdLine@2
-  #                 displayName: "Create .env"
-  #                 inputs:
-  #                   script: |
-  #                     echo "abc"
-  #                   failOnStderr: true
-  #                   # workingDirectory: $(Agent.BuildDirectory)/api-drop
+  - stage: deploy
+    displayName: "Deploy"
+    jobs:
+      - deployment: VMDeploy
+        displayName: Deploy API
+        environment:
+          name: dev
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: CmdLine@2
+                  displayName: "Create .env"
+                  inputs:
+                    script: |
+                      echo "abc"
+                    failOnStderr: true
+                    # workingDirectory: $(Agent.BuildDirectory)/api-drop
   #               # - task: CopyFiles@2
   #               #   displayName: "Copy to deploy folder"
   #               #   inputs:
