@@ -94,7 +94,8 @@ stages:
                   inputs:
                     script: |
                       echo "abc"
-                      ls $(Build.ArtifactStagingDirectory)
+                      pwd
+                    workingDirectory: $(Agent.BuildDirectory)
                     failOnStderr: true
                 - task: CmdLine@2
                   displayName: "Install, Build"
@@ -104,38 +105,12 @@ stages:
                       pwd
                       ls
                     # workingDirectory: $(Agent.BuildDirectory)/api-drop
-  #               # - task: CopyFiles@2
-  #               #   displayName: "Copy to deploy folder"
-  #               #   inputs:
-  #               #     SourceFolder: "$(Agent.BuildDirectory)/api-drop"
-  #               #     Contents: "**"
-  #               #     TargetFolder: "/srv/strapi"
-  #               #     CleanTargetFolder: true
-  #               #     OverWrite: true
+                - task: CopyFiles@2
+                  displayName: "Copy to deploy folder"
+                  inputs:
+                    SourceFolder: "$(Agent.BuildDirectory)"
+                    Contents: "**"
+                    TargetFolder: "/ect/server"
+                    CleanTargetFolder: true
+                    OverWrite: true
 
-                # - task: CmdLine@2
-                #   displayName: "Install, Build"
-                #   inputs:
-                #     script: |
-                #       yarn
-                #       yarn build
-                #       whereis pm2
-                #       pwd
-                #       whoami
-                #       #pm2 restart ecosystem.config.js
-                    # workingDirectory: /srv/strapi
-  #               # - task: Bash@3
-  #               #   displayName: "Restart PM2"
-  #               #   inputs:
-  #               #     targetType: 'inline'
-  #               #     script: |
-  #               #       pm2 reload ecosystem.config.js
-  #               #     workingDirectory: /srv/strapi
-  #               #     noProfile: false
-  #               #     noRc: false
-  #               - task: Bash@3
-  #                 displayName: "Restart PM2"
-  #                 inputs:
-  #                   filePath: '/srv/strapi/scripts/deploy.sh'
-  #                   noProfile: false
-  #                   noRc: false
