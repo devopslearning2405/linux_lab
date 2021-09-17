@@ -8,10 +8,10 @@ trigger:
 
 
 
-pool:
-  vmImage: 'ubuntu-latest'
+# pool:
+#   vmImage: 'ubuntu-latest'
 
-steps:
+# steps:
 # - task: NodeTool@0
 #   inputs:
 #     versionSpec: '12.x'
@@ -29,30 +29,128 @@ steps:
 #     targetFolder: $(Build.ArtifactStagingDirectory)/npm
 #   displayName: 'Copy npm package'
 
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: '.'
-    # contents: 'package.json' 
-    targetFolder: '$(Build.ArtifactStagingDirectory)'
-  displayName: 'Copy code'
+# - task: CopyFiles@2
+#   inputs:
+#     sourceFolder: '.'
+#     # contents: 'package.json' 
+#     targetFolder: '$(Build.ArtifactStagingDirectory)'
+#   displayName: 'Copy code'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: be-api
-  displayName: 'Publish npm artifact'
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#     artifactName: be-api
+#   displayName: 'Publish npm artifact'
 
 
-# # - deployment: VMDeploy
-#   runs-on: ubuntu-latest
-#   displayName: Build Maven Project
-#   # pool:
-#   #   vmImage: 'ubuntu-latest'
-#   environment:
-#     name: dev
-#     resourceType: VirtualMachine
-#   strategy:
-#     runOnce:
-#       deploy:
-#         steps:
-#         - script: echo my first deployment
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+# trigger:
+#   - development
+
+# pr: none
+
+stages:
+  - stage: build
+    displayName: "Build"
+    jobs:
+      - job: build_test
+        displayName: "Archive API"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          # - task: ArchiveFiles@2
+          #   displayName: 'Archive raw API files'
+          #   inputs:
+          #       rootFolderOrFile: '$(System.DefaultWorkingDirectory)/packages/api'
+          #       includeRootFolder: false
+          #       archiveType: zip
+          #       archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-api.zip'
+          #       replaceExistingArchive: true
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish API Artifact"
+            inputs:
+              targetPath: "$(System.DefaultWorkingDirectory)/packages/api"
+              artifact: "api-drop"
+              publishLocation: "pipeline"
+        # - task: NodeTool@0
+        #   inputs:
+        #     versionSpec: '14.x'
+        #   displayName: 'Install Node.js'
+        # - script: |
+        #     yarn install
+        #     yarn build
+        #   displayName: 'Build Web'
+        #   workingDirectory: packages/web
+        # - task: ArchiveFiles@2
+        #   displayName: 'Archive Web'
+        #   inputs:
+        #     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/packages/web/build'
+        #     includeRootFolder: false
+        #     archiveType: 'zip'
+        #     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-web.zip'
+        #     replaceExistingArchive: true
+        # - task: PublishPipelineArtifact@1
+        #   displayName: 'Publish Web Artifact'
+        #   inputs:
+        #     targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-web.zip'
+        #     artifact: 'web-drop'
+        #     publishLocation: 'pipeline'
+
+  - stage: deploy
+    displayName: "Deploy"
+    jobs:
+      - deployment: VMDeploy
+        displayName: Deploy API
+        environment:
+          name: dev
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: CmdLine@2
+                  displayName: "Create .env"
+                  inputs:
+                    script: |
+                      echo "abc"
+                    failOnStderr: true
+                    workingDirectory: $(Agent.BuildDirectory)/api-drop
+                - task: CopyFiles@2
+                  displayName: "Copy to deploy folder"
+                  inputs:
+                    SourceFolder: "$(Agent.BuildDirectory)/api-drop"
+                    Contents: "**"
+                    TargetFolder: "/srv/strapi"
+                    CleanTargetFolder: true
+                    OverWrite: true
+
+                - task: CmdLine@2
+                  displayName: "Install, Build"
+                  inputs:
+                    script: |
+                      yarn
+                      yarn build
+                      whereis pm2
+                      pwd
+                      whoami
+                      #pm2 restart ecosystem.config.js
+                    workingDirectory: /srv/strapi
+                # - task: Bash@3
+                #   displayName: "Restart PM2"
+                #   inputs:
+                #     targetType: 'inline'
+                #     script: |
+                #       pm2 reload ecosystem.config.js
+                #     workingDirectory: /srv/strapi
+                #     noProfile: false
+                #     noRc: false
+                - task: Bash@3
+                  displayName: "Restart PM2"
+                  inputs:
+                    filePath: '/srv/strapi/scripts/deploy.sh'
+                    noProfile: false
+                    noRc: false
