@@ -1,0 +1,75 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yamlt
+
+trigger:
+- master
+
+
+stages:
+  - stage: build
+    displayName: "Build"
+    jobs:
+      - job: build_test
+        displayName: "Archive API"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish API Artifact"
+            inputs:
+              # pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              targetPath: "$(System.DefaultWorkingDirectory)"
+              artifact: "be-api"
+              publishLocation: "pipeline"
+
+  - stage: deploy
+    displayName: "Deploy"
+    jobs:
+      - deployment: VMDeploy
+        displayName: Deploy API
+        environment:
+          name: dev
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: CmdLine@2
+                  displayName: "Create .env"
+                  inputs:
+                    script: |
+                      pwd
+                      ls
+                    workingDirectory: $(Agent.BuildDirectory)
+                    failOnStderr: true
+                - task: AzureNLBManagement@1
+                  displayName: 'Azure Network Load Balancer: demo - Disconnect'
+                  inputs:
+                    azureSubscription: 'Azure subscription 1 (a3e89750-0bc6-4e52-ba4e-99278f34c1bb)'
+                    ResourceGroupName: motion
+                    LoadBalancer: demo
+                    Action: Disconnect
+                - task: CopyFiles@2
+                  displayName: "Copy to deploy folder"
+                  inputs:
+                    SourceFolder: "$(Agent.BuildDirectory)/be-api"
+                    Contents: "**"
+                    TargetFolder: "/etc/server"
+                    CleanTargetFolder: true
+                    OverWrite: true
+                - task: CmdLine@2
+                  displayName: "Install, Build"
+                  inputs:
+                    script: |
+                      yarn
+                      yarn build
+                      which pm2
+                      pwd
+                      ls
+                      whoami
+                      pm2 restart app.js
+                    workingDirectory: /etc/server
+
