@@ -7,41 +7,69 @@ trigger:
 - master
 
 
+stages:
+  - stage: build
+    displayName: "Build"
+    jobs:
+      - job: build_test
+        displayName: "Archive API"
+        pool:
+          vmImage: ubuntu-latest
+        steps:
 
-pool:
-  vmImage: 'ubuntu-latest'
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish API Artifact"
+            inputs:
+              # pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              targetPath: "$(System.DefaultWorkingDirectory)"
+              artifact: "be-api"
+              publishLocation: "pipeline"
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '12.x'
-  displayName: 'Install Node.js'
+  - stage: deploy
+    displayName: "Deploy"
+    jobs:
+      - deployment: VMDeploy
+        displayName: Deploy API
+        environment:
+          name: dev
+          resourceType: VirtualMachine
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: CmdLine@2
+                  displayName: "Create .env"
+                  inputs:
+                    script: |
+                      pwd
+                      ls
+                    workingDirectory: $(Agent.BuildDirectory)
+                    failOnStderr: true
+                - task: AzureNLBManagement@1
+                  displayName: 'Azure Network Load Balancer: demo - Disconnect'
+                  inputs:
+                    azureSubscription: 'Azure subscription 1 (a3e89750-0bc6-4e52-ba4e-99278f34c1bb)'
+                    ResourceGroupName: motion
+                    LoadBalancer: demo
+                    Action: Disconnect
+                - task: CopyFiles@2
+                  displayName: "Copy to deploy folder"
+                  inputs:
+                    SourceFolder: "$(Agent.BuildDirectory)/be-api"
+                    Contents: "**"
+                    TargetFolder: "/etc/server"
+                    CleanTargetFolder: true
+                    OverWrite: true
+                - task: CmdLine@2
+                  displayName: "Install, Build"
+                  inputs:
+                    script: |
+                      yarn
+                      yarn build
+                      which pm2
+                      pwd
+                      ls
+                      whoami
+                      pm2 restart app.js
+                    workingDirectory: /etc/server
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-
-- script: |
-    npm pack
-  displayName: 'Package for npm release'
-
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: '*.tgz' 
-    targetFolder: $(Build.ArtifactStagingDirectory)/npm
-  displayName: 'Copy npm package'
-
-- task: CopyFiles@2
-  inputs:
-    sourceFolder: '$(Build.SourcesDirectory)'
-    contents: 'package.json' 
-    targetFolder: $(Build.ArtifactStagingDirectory)/npm
-  displayName: 'Copy package.json'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/npm'
-    artifactName: npm
-  displayName: 'Publish npm artifact'
